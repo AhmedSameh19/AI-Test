@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Heart Attack Prediction</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f9;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+        }
+        .container {
+            background: #fff;
+            padding: 2rem;
+            border-radius: 8px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+            max-width: 400px;
+            width: 100%;
+        }
+        h1 {
+            text-align: center;
+            color: #333;
+            margin-bottom: 1rem;
+        }
+        form {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
+        label {
+            font-weight: bold;
+            color: #555;
+        }
+        input, select {
+            padding: 0.5rem;
+            font-size: 1rem;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+        }
+        button {
+            padding: 0.7rem;
+            font-size: 1rem;
+            color: #fff;
+            background-color: #007BFF;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+        button:hover {
+            background-color: #0056b3;
+        }
+        .result {
+            text-align: center;
+            margin-top: 1rem;
+            font-size: 1.2rem;
+            color: #333;
+        }
+        .radio-group {
+            display: flex;
+            gap: 1rem;
+        }
+        .radio-group label {
+            font-weight: normal;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Heart Attack Prediction</h1>
+        <form id="predictionForm">
+            <!-- Birthdate -->
+            <label for="birthdate">Birthdate:</label>
+            <input type="date" id="birthdate" name="birthdate" required>
+            
+            <!-- Sex -->
+            <label for="sex">Sex:</label>
+            <div class="radio-group">
+                <label><input type="radio" name="sex" value="1" required> Male</label>
+                <label><input type="radio" name="sex" value="0" required> Female</label>
+            </div>
+
+            <!-- Chest Pain Type (cp) -->
+            <label for="cp">Chest Pain Type:</label>
+            <input type="number" id="cp" name="cp" placeholder="0-3" min="0" max="3" required>
+
+            <!-- Resting Electrocardiographic Results (restecg) -->
+            <label for="restecg">Resting Electrocardiographic  Results:</label>
+            <input type="number" id="restecg" name="restecg" placeholder="0-2" min="0" max="2" required>
+
+            <!-- Maximum Heart Rate Achieved (thalach) -->
+            <label for="thalach">Max Heart Rate Achieved:</label>
+            <input type="number" id="thalach" name="thalach" placeholder="Enter max heart rate" required>
+
+            <!-- Slope of Peak Exercise ST Segment (slope) -->
+            <label for="slope">Slope of ST Segment:</label>
+            <input type="number" id="slope" name="slope" placeholder="0-2" min="0" max="2" required>
+
+            <!-- Number of Major Vessels (ca) -->
+            <label for="ca">Number of Major Vessels:</label>
+            <input type="number" id="ca" name="ca" placeholder="0-3" min="0" max="3" required>
+
+            <!-- Thalassemia (thal) -->
+            <label for="thal">Thalassemia:</label>
+            <input type="number" id="thal" name="thal" placeholder="1 = Normal, 2 = Fixed Defect, 3 = Reversible Defect" min="1" max="3" required>
+
+            <!-- Submit Button -->
+            <button type="submit">Predict</button>
+        </form>
+        <div class="result">
+            Prediction: <span id="predictionResult"></span>
+        </div>
+    </div>
+
+    <script>
+        document.getElementById('predictionForm').onsubmit = async function(event) {
+            event.preventDefault();
+
+            // Calculate age based on birthdate
+            const birthdate = new Date(document.getElementById('birthdate').value);
+            const today = new Date();
+            let age = today.getFullYear() - birthdate.getFullYear();
+            const monthDifference = today.getMonth() - birthdate.getMonth();
+          
+            if (monthDifference < 0 || (monthDifference === 0 && today.getDate() < birthdate.getDate())) {
+                age--;
+            }
+            // Collect input values from the form
+            const sex = document.querySelector('input[name="sex"]:checked').value;
+            const features = [
+                age,
+                parseInt(sex),
+                parseInt(document.getElementById('cp').value),
+                parseInt(document.getElementById('restecg').value),
+                parseFloat(document.getElementById('thalach').value),
+                parseInt(document.getElementById('slope').value),
+                parseInt(document.getElementById('ca').value),
+                parseInt(document.getElementById('thal').value)
+            ];
+
+            // Send data to the Flask backend
+            const response = await fetch('/predict', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ features: features }),
+            });
+
+            // Parse and display the prediction result
+            const result = await response.json();
+            document.getElementById('predictionResult').textContent = result.prediction;
+        };
+    </script>
+</body>
+</html>
