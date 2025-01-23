@@ -89,7 +89,7 @@
             <input type="number" id="cp" name="cp" placeholder="0-3" min="0" max="3" required>
 
             <!-- Resting Electrocardiographic Results (restecg) -->
-            <label for="restecg">Resting Electrocardiographic  Results:</label>
+            <label for="restecg">Resting Electrocardiographic Results:</label>
             <input type="number" id="restecg" name="restecg" placeholder="0-2" min="0" max="2" required>
 
             <!-- Maximum Heart Rate Achieved (thalach) -->
@@ -108,30 +108,32 @@
             <label for="thal">Thalassemia:</label>
             <input type="number" id="thal" name="thal" placeholder="1 = Normal, 2 = Fixed Defect, 3 = Reversible Defect" min="1" max="3" required>
 
-            <!-- Submit Button -->
-            <button type="submit">Predict</button>
+            <!-- Buttons for each model -->
+            <button type="button" id="model1Button">Predict with LR</button>
+            <button type="button" id="model2Button">Predict with RF</button>
         </form>
+
         <div class="result">
-            Prediction: <span id="predictionResult"></span>
+            Prediction with LR Model: <span id="predictionResult1"></span>
+        </div>
+        <div class="result">
+            Prediction with RF: <span id="predictionResult2"></span>
         </div>
     </div>
 
     <script>
-        document.getElementById('predictionForm').onsubmit = async function(event) {
-            event.preventDefault();
-
-            // Calculate age based on birthdate
+        // Collect form data
+        const getFormData = () => {
             const birthdate = new Date(document.getElementById('birthdate').value);
             const today = new Date();
             let age = today.getFullYear() - birthdate.getFullYear();
             const monthDifference = today.getMonth() - birthdate.getMonth();
-          
             if (monthDifference < 0 || (monthDifference === 0 && today.getDate() < birthdate.getDate())) {
                 age--;
             }
-            // Collect input values from the form
+
             const sex = document.querySelector('input[name="sex"]:checked').value;
-            const features = [
+            return [
                 age,
                 parseInt(sex),
                 parseInt(document.getElementById('cp').value),
@@ -141,8 +143,11 @@
                 parseInt(document.getElementById('ca').value),
                 parseInt(document.getElementById('thal').value)
             ];
+        };
 
-            // Send data to the Flask backend
+        // Handle Model 1 Prediction
+        document.getElementById('model1Button').onclick = async function() {
+            const features = getFormData();
             const response = await fetch('/predict', {
                 method: 'POST',
                 headers: {
@@ -150,10 +155,22 @@
                 },
                 body: JSON.stringify({ features: features }),
             });
-
-            // Parse and display the prediction result
             const result = await response.json();
-            document.getElementById('predictionResult').textContent = result.prediction;
+            document.getElementById('predictionResult1').textContent = result.prediction;
+        };
+
+        // Handle Model 2 Prediction
+        document.getElementById('model2Button').onclick = async function() {
+            const features = getFormData();
+            const response = await fetch('/predict2', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ features: features }),
+            });
+            const result = await response.json();
+            document.getElementById('predictionResult2').textContent = result.prediction;
         };
     </script>
 </body>
