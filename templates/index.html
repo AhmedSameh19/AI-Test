@@ -1,11 +1,11 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Heart Attack Prediction</title>
     <style>
-        /* General Styles */
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             background-color: #f0f4f8;
@@ -19,11 +19,8 @@
         }
 
         .container {
-            background: #ffffff;
             padding: 2rem;
-            border-radius: 12px;
-            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
-            max-width: 800px; /* Increased width for two columns */
+            max-width: 1200px;
             width: 100%;
             margin: 1rem;
         }
@@ -37,7 +34,7 @@
 
         form {
             display: grid;
-            grid-template-columns: 1fr 1fr; /* Two columns */
+            grid-template-columns: 1fr 1fr;
             gap: 1.2rem;
         }
 
@@ -52,7 +49,8 @@
             margin-bottom: 0.5rem;
         }
 
-        input, select {
+        input,
+        select {
             padding: 0.8rem;
             font-size: 1rem;
             border: 1px solid #ddd;
@@ -62,7 +60,8 @@
             transition: border-color 0.3s ease;
         }
 
-        input:focus, select:focus {
+        input:focus,
+        select:focus {
             border-color: #007BFF;
             outline: none;
         }
@@ -73,20 +72,10 @@
             margin: 0;
         }
 
-        .radio-group {
-            display: flex;
-            gap: 1rem;
-        }
 
-        .radio-group label {
-            font-weight: normal;
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
-        }
 
         button {
-            grid-column: span 2; /* Button spans both columns */
+            grid-column: span 2;
             padding: 0.8rem;
             font-size: 1rem;
             color: #fff;
@@ -108,7 +97,7 @@
         }
 
         .result {
-            grid-column: span 2; /* Result spans both columns */
+            grid-column: span 2;
             text-align: center;
             margin-top: 1.5rem;
             font-size: 1.2rem;
@@ -118,27 +107,6 @@
             background-color: #e9f5ff;
         }
 
-        .loading {
-            grid-column: span 2; /* Loading spinner spans both columns */
-            display: none;
-            text-align: center;
-            margin-top: 1rem;
-        }
-
-        .loading-spinner {
-            border: 4px solid #f3f3f3;
-            border-top: 4px solid #007BFF;
-            border-radius: 50%;
-            width: 30px;
-            height: 30px;
-            animation: spin 1s linear infinite;
-            margin: 0 auto;
-        }
-
-        @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
-        }
 
         .error {
             color: #e74c3c;
@@ -147,126 +115,260 @@
             display: none;
         }
 
-        /* Responsive Design */
-        @media (max-width: 768px) {
-            form {
-                grid-template-columns: 1fr; /* Switch to one column on smaller screens */
-            }
-
-            button, .result, .loading {
-                grid-column: span 1;
-            }
+        .error {
+            color: red;
+            display: none;
         }
+
+        select:invalid+.error {
+            display: none;
+        }
+
+        .tooltip-container {
+            display: inline-block;
+            position: relative;
+            cursor: pointer;
+            color: #007bff;
+            margin-left: 5px;
+        }
+
+        .tooltip-container .tooltip-text {
+            visibility: hidden;
+            width: auto;
+            background-color: #333;
+            color: #fff;
+            text-align: center;
+            padding: 5px 10px;
+            border-radius: 5px;
+            position: absolute;
+            z-index: 1;
+            bottom: 125%;
+            left: 50%;
+            transform: translateX(-50%);
+            white-space: nowrap;
+            font-size: 0.875rem;
+            opacity: 0;
+            transition: opacity 0.3s;
+        }
+
+        .tooltip-container .tooltip-text::after {
+            content: '';
+            position: absolute;
+            top: 100%;
+            left: 50%;
+            margin-left: -5px;
+            border-width: 5px;
+            border-style: solid;
+            border-color: #333 transparent transparent transparent;
+        }
+
+        .tooltip-container:hover .tooltip-text,
+        .tooltip-container:focus .tooltip-text {
+            visibility: visible;
+            opacity: 1;
+        }
+        .topbar {
+            position: fixed;  
+            top: 0;
+            left: 0;
+            width: 100%; 
+            background-color: #333;
+            color: white;
+            padding: 15px;
+            text-align: center;
+            z-index: 1000;
+        }
+
+        .content {
+            padding-top: 60px;
+        }
+
+        .topbar a {
+            color: white;
+            text-decoration: none;
+            padding: 0 15px;
+        }
+
+        .topbar a:hover {
+            text-decoration: underline;
+        }
+
+      
     </style>
 </head>
+
 <body>
     <div class="container">
+        <div class="topbar">
+            <a href="/">Home</a>
+            <a href="/dashboard">Dashboard</a>
+        </div>
         <h1>Heart Attack Prediction</h1>
         <form id="predictionForm">
-            <!-- Column 1 -->
             <div class="form-group">
-                <label for="birthdate">Birthdate:</label>
-                <input type="date" id="birthdate" name="birthdate" required>
-                <div class="error" id="birthdateError">Please enter a valid birthdate.</div>
+                <label for="sex">Gender:</label>
+                <select id="sex" name="sex" required>
+                    <option value="" disabled selected>Select Gender</option>
+                    <option value="1">Male</option>
+                    <option value="0">Female</option>
+                </select>
+                <div class="error" id="sexError">Please select a valid gender.</div>
             </div>
 
             <div class="form-group">
-                <label>Gender:</label>
-                <div class="radio-group">
-                    <label><input type="radio" name="sex" value="1" required> Male</label>
-                    <label><input type="radio" name="sex" value="0" required> Female</label>
-                </div>
+                <label for="cp">
+                    Chest Pain Type:
+                    <div class="tooltip-container" tabindex="0">
+                        ?
+                        <div class="tooltip-text">Select the type of chest pain you are experiencing.</div>
+                    </div>
+                </label>
+                <select id="cp" name="cp" required>
+                    <option value="" disabled selected>Please select a chest pain type</option>
+                    <option value="3">Asymptomatic</option>
+                    <option value="2">Non-anginal pain</option>
+                    <option value="1">Atypical angina</option>
+                    <option value="0">Typical angina</option>
+                </select>
+                <div class="error" id="cpError">Please select a valid chest pain type.</div>
             </div>
 
             <div class="form-group">
-                <label for="cp">Chest Pain Type (0-3):</label>
-                <input type="number" id="cp" name="cp" placeholder="Enter chest pain type" min="0" max="3" required>
-                <div class="error" id="cpError">Please enter a value between 0 and 3.</div>
-            </div>
-
-            <div class="form-group">
-                <label for="trestbps">Resting Blood Pressure:</label>
+                <label for="trestbps">
+                    Resting Blood Pressure in mm Hg:
+                    <div class="tooltip-container" tabindex="0">
+                        ?
+                        <div class="tooltip-text">The average resting blood pressure is around 120 mm Hg.</div>
+                    </div>
+                </label>
                 <input type="number" id="trestbps" name="trestbps" placeholder="Enter resting blood pressure" required>
                 <div class="error" id="trestbpsError">Please enter a valid blood pressure.</div>
             </div>
 
             <div class="form-group">
-                <label for="chol">Cholesterol:</label>
+                <label for="chol">
+                    Cholesterol in mg/dl:
+                    <div class="tooltip-container" tabindex="0">
+                        ?
+                        <div class="tooltip-text">The average is around 200 mg/dL.</div>
+                    </div>
+                </label>
                 <input type="number" id="chol" name="chol" placeholder="Enter cholesterol level" required>
-                <div class="error" id="cholError">Please enter a valid cholesterol level.</div>
+                <div class="error" id="cholError">Please enter a valid cholesterol value.</div>
+            </div>
+            <div class="form-group">
+                <label for="restecg">
+                    Resting ElectroCardioGraphic Results:
+                    <div class="tooltip-container" tabindex="0">
+                        ?
+                        <div class="tooltip-text">Choose the result of your resting electrocardiogram (ECG) test.</div>
+                    </div>
+                </label>
+                <select id="restecg" name="restecg" required>
+                    <option value="" disabled selected>Please select an ECG result</option>
+                    <option value="2">Probable or definite left ventricular hypertrophy</option>
+                    <option value="1">ST-T wave abnormality</option>
+                    <option value="0">Normal</option>
+                </select>
+                <div class="error" id="restecgError">Please select a valid ECG result.</div>
             </div>
 
-            <!-- Column 2 -->
             <div class="form-group">
-                <label for="restecg">Resting ECG Results (0-2):</label>
-                <input type="number" id="restecg" name="restecg" placeholder="Enter ECG result" min="0" max="2" required>
-                <div class="error" id="restecgError">Please enter a value between 0 and 2.</div>
-            </div>
-
-            <div class="form-group">
-                <label for="thalach">Max Heart Rate Achieved:</label>
+                <label for="thalach">
+                    Max Heart Rate Achieved:
+                    <div class="tooltip-container" tabindex="0">
+                        ?
+                        <div class="tooltip-text">The average max heart rate is around 150 bpm.</div>
+                    </div>
+                </label>
                 <input type="number" id="thalach" name="thalach" placeholder="Enter max heart rate" required>
                 <div class="error" id="thalachError">Please enter a valid heart rate.</div>
             </div>
 
             <div class="form-group">
-                <label>Exercise Induced Angina:</label>
-                <div class="radio-group">
-                    <label><input type="radio" name="exang" value="1" required> Yes</label>
-                    <label><input type="radio" name="exang" value="0" required> No</label>
-                </div>
+                <label for="exang">
+                    Exercise Induced Angina:
+                    <div class="tooltip-container" tabindex="0">
+                        ?
+                        <div class="tooltip-text">Indicates if you experience chest pain during physical activity.</div>
+                    </div>
+                </label>
+                <select id="exang" name="exang" required>
+                    <option value="" disabled selected>Select an option</option>
+                    <option value="1">Yes</option>
+                    <option value="0">No</option>
+                </select>
+                <div class="error" id="exangError">Please select a valid option.</div>
             </div>
 
             <div class="form-group">
-                <label for="slope">Slope of ST Segment (0-2):</label>
-                <input type="number" id="slope" name="slope" placeholder="Enter slope" min="0" max="2" required>
-                <div class="error" id="slopeError">Please enter a value between 0 and 2.</div>
+                <label for="slope">
+                    Slope of ST Segment:
+                    <div class="tooltip-container" tabindex="0">
+                        ?
+                        <div class="tooltip-text">Indicates the slope of your ST segment on an ECG.</div>
+                    </div>
+                </label>
+                <select id="slope" name="slope" required>
+                    <option value="" disabled selected>Please select a slope</option>
+                    <option value="2">Downsloping</option>
+                    <option value="1">Flat</option>
+                    <option value="0">Upsloping</option>
+                </select>
+                <div class="error" id="slopeError">Please select a valid slope.</div>
             </div>
 
             <div class="form-group">
-                <label for="ca">Number of Major Vessels (0-3):</label>
-                <input type="number" id="ca" name="ca" placeholder="Enter number of vessels" min="0" max="3" required>
-                <div class="error" id="caError">Please enter a value between 0 and 3.</div>
+                <label for="ca">
+                    Number of Major Vessels colored by fluoroscopy:
+                    <div class="tooltip-container" tabindex="0">
+                        ?
+                        <div class="tooltip-text">This indicates the number of blocked arteries detected in your test.</div>
+                    </div>
+                </label>
+                <select id="ca" name="ca" required>
+                    <option value="" disabled selected>Select number of vessels</option>
+                    <option value="0">0</option>
+                    <option value="1">1</option>
+                    <option value="2">2</option>
+                    <option value="3">3</option>
+                </select>
+                <div class="error" id="caError">Please select a valid number of vessels.</div>
             </div>
+
 
             <div class="form-group">
-                <label for="thal">Thalassemia:</label>
-                <input type="number" id="thal" name="thal" placeholder="1 = Normal, 2 = Fixed Defect, 3 = Reversible Defect" min="1" max="3" required>
-                <div class="error" id="thalError">Please enter a value between 1 and 3.</div>
+                <label for="thal">
+                    Thalassemia:
+                    <div class="tooltip-container" tabindex="0">
+                        ?
+                        <div class="tooltip-text">Select the type of thalassemia you have, if applicable.</div>
+                    </div>
+                </label>
+                <select id="thal" name="thal" required>
+                    <option value="" disabled selected>Select Thalassemia Type</option>
+                    <option value="1">Normal</option>
+                    <option value="2">Fixed Defect</option>
+                    <option value="3">Reversible Defect</option>
+                </select>
+                <div class="error" id="thalError">Please select a valid Thalassemia type.</div>
             </div>
 
-            <!-- Submit Button -->
             <button type="button" id="predictButton">Predict</button>
         </form>
 
-        <!-- Loading Spinner -->
-        <div class="loading" id="loading">
-            <div class="loading-spinner"></div>
-            <p>Predicting...</p>
-        </div>
-
-        <!-- Prediction Result -->
         <div class="result" id="predictionResult">
             Prediction: <span id="resultText"></span>
         </div>
     </div>
 
     <script>
-        // Collect form data
         const getFormData = () => {
-            const birthdate = new Date(document.getElementById('birthdate').value);
-            const today = new Date();
-            let age = today.getFullYear() - birthdate.getFullYear();
-            const monthDifference = today.getMonth() - birthdate.getMonth();
-            if (monthDifference < 0 || (monthDifference === 0 && today.getDate() < birthdate.getDate())) {
-                age--;
-            }
-
-            const sex = document.querySelector('input[name="sex"]:checked').value;
-            const exang = document.querySelector('input[name="exang"]:checked').value;
+        
+            const sex = document.getElementById('sex').value;
+            const exang = document.getElementById('exang').value;
 
             return [
-                age,
                 parseInt(sex),
                 parseInt(document.getElementById('cp').value),
                 parseInt(document.getElementById('trestbps').value),
@@ -280,28 +382,42 @@
             ];
         };
 
-        // Handle Prediction
-        document.getElementById('predictButton').onclick = async function() {
-         
-            const inputs = document.querySelectorAll('input[required]');
-            // Show loading spinner
-            document.getElementById('predictionResult').style.display = 'none';
+        document.getElementById('predictButton').onclick = async function () {
+            let valid = true;
 
-            const features = getFormData();
-            const response = await fetch('/predict', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({ features: features }),
+            const inputs = document.querySelectorAll('input[required], select[required]');
+            inputs.forEach(input => {
+                const errorElement = document.getElementById(`${input.id}Error`);
+                if (!input.value) {
+                    errorElement.style.display = 'block';
+                    valid = false;
+                } else {
+                    errorElement.style.display = 'none';
+                }
             });
-            const result = await response.json();
 
-            // Hide loading spinner and show result
-            document.getElementById('loading').style.display = 'none';
-            document.getElementById('predictionResult').style.display = 'block';
-            document.getElementById('resultText').textContent = result.prediction;
+            if (!valid) return;
+
+            try {
+                const features = getFormData();
+                const response = await fetch('/predict', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ features: features }),
+                });
+                const result = await response.json();
+
+                document.getElementById('predictionResult').style.display = 'block';
+                document.getElementById('resultText').textContent = result.prediction;
+            } catch (error) {
+                console.error('Error during prediction:', error);
+                alert('An error occurred while predicting. Please try again.');
+            }
         };
     </script>
+
 </body>
+
 </html>

@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Model Dashboard</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f0f4f8;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            color: #333;
+        }
+
+        .container {
+            padding: 2rem;
+            width: 100%;
+            margin: 1rem;
+        }
+
+        h1 ,h2{
+            text-align: center;
+            color: #2c3e50;
+            margin-bottom: 1.5rem;
+            font-size: 2rem;
+        }
+        .charts {
+            display: flex;
+            justify-content: space-around;
+            margin-top: 30px;
+        }
+        .chart {
+            width: 45%;
+        }
+        img {
+            width: 100%;
+        }
+        .topbar {
+            position: fixed; 
+            top: 0;
+            left: 0;
+            width: 100%; 
+            background-color: #333;
+            color: white;
+            padding: 15px;
+            text-align: center;
+            z-index: 1000; 
+            margin-bottom: 30px;
+        }
+
+        .content {
+            padding-top: 60px; 
+        }
+
+        .topbar a {
+            color: white;
+            text-decoration: none;
+            padding: 0 15px;
+        }
+
+        .topbar a:hover {
+            text-decoration: underline;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="topbar">
+            <a href="/">Home</a>
+            <a href="/dashboard">Dashboard</a>
+        </div>
+        <h1>Model Performance Dashboard</h1>
+        <div class="charts">
+            <div class="chart">
+                <h2>Accuracy and F1-Score Comparison</h2>
+                <img src="{{ url_for('static', filename='accuracy_f1_comparison.png') }}" alt="Accuracy and F1-Score Comparison">
+            </div>
+
+            <div class="chart">
+                <h2>ROC Curve</h2>
+                <img src="{{ url_for('static', filename='roc_curve.png') }}" alt="ROC Curve">
+            </div>
+        </div>
+
+        <div class="charts">
+            <div class="chart">
+                <h2>Confusion Matrix - Logistic Regression</h2>
+                <img src="{{ url_for('static', filename='cm_log_reg.png') }}" alt="Confusion Matrix - Logistic Regression">
+            </div>
+
+            <div class="chart">
+                <h2>Confusion Matrix - Random Forest</h2>
+                <img src="{{ url_for('static', filename='cm_rf.png') }}" alt="Confusion Matrix - Random Forest">
+            </div>
+        </div>
+        <div class="charts">
+            <div class="chart">
+                <h2>Accuracy and F1-Score Comparison</h2>
+                <img src="{{ url_for('static', filename='model_comparison.png') }}" alt="Accuracy and F1-Score Comparison">
+            </div>
+        </div>
+    </div>
+</body>
+</html>
